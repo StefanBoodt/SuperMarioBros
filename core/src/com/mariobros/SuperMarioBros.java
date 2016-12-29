@@ -44,7 +44,7 @@ public class SuperMarioBros extends Game {
 	/**
 	 * Scale for the game.
 	 */
-	public static final float PPM = 100f;
+	public static final float PPM = 1f;
 
 	/**
 	 * The bit that states that nothing collides.

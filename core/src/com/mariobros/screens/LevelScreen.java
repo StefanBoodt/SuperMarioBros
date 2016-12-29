@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
@@ -70,12 +71,12 @@ public class LevelScreen implements Screen, Updateable {
     public LevelScreen(SuperMarioBros game) {
         this.game = game;
         gamecam = new OrthographicCamera();
-        gamePort = new FitViewport(SuperMarioBros.V_WIDTH / SuperMarioBros.PPM, SuperMarioBros.V_HEIGHT / SuperMarioBros.PPM);
+        gamePort = new FitViewport(SuperMarioBros.V_WIDTH / SuperMarioBros.PPM, SuperMarioBros.V_HEIGHT / SuperMarioBros.PPM, gamecam);
         hud = new HUD(game.batch, "1-1", 300);
         maploader = new TmxMapLoader();
-        //map = maploader.load("testworld.tmx");
-        map = maploader.load("Graphics-tests.tmx");
-        renderer = new OrthogonalTiledMapRenderer(map, 1 / SuperMarioBros.PPM);
+        map = maploader.load("testworld.tmx");
+        //map = maploader.load("Graphics-tests.tmx");
+        renderer = new OrthogonalTiledMapRenderer(map, 1 / SuperMarioBros.PPM, game.batch);
         gamecam.position.set(gamePort.getWorldWidth() / 2, gamePort.getWorldHeight() / 2, 0);
         world = new World(new Vector2(0, -10), true);
     }
@@ -94,6 +95,7 @@ public class LevelScreen implements Screen, Updateable {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         renderer.render();
+        //System.out.println("Rendered: " + renderer.getViewBounds());
 
         game.batch.setProjectionMatrix(hud.stage.getCamera().combined);
         hud.stage.draw();
@@ -131,12 +133,14 @@ public class LevelScreen implements Screen, Updateable {
      * @param dt The delta time.
      */
     public void handleInput(float dt) {
-        if (Gdx.input.isKeyPressed(Input.Keys.ANY_KEY)) {
+        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
             gamecam.position.x += 100 * dt;
-            System.out.println("key touched.");
-        } else if (Gdx.input.isTouched()) {
-            gamecam.position.x += 100 * dt;
-            System.out.println("Screen touched.");
+        } else if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+            gamecam.position.x -= 100 * dt;
+        } else if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+            gamecam.position.y += 100 * dt;
+        } else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+            gamecam.position.y -= 100 * dt;
         }
     }
 
