@@ -36,12 +36,12 @@ public enum PowerUp {
             BodyDef bdef = new BodyDef();
             bdef.position.set(position);
             bdef.type = BodyDef.BodyType.DynamicBody;
-            PowerUp.body = PowerUp.world.createBody(bdef);
+            this.body = PowerUp.world.createBody(bdef);
             FixtureDef fdef = new FixtureDef();
             CircleShape shape = new CircleShape();
             shape.setRadius(6 / SuperMarioBros.PPM);
             fdef.shape = shape;
-            PowerUp.body.createFixture(fdef);
+            this.body.createFixture(fdef);
         }
 
         @Override
@@ -59,7 +59,7 @@ public enum PowerUp {
     /**
      * Marios body.
      */
-    protected static Body body;
+    protected Body body;
 
     /**
      * The world to live in.
@@ -80,8 +80,8 @@ public enum PowerUp {
      * Returns the position.
      * @return The position.
      */
-    public static Vector2 getPosition() {
-        return body.getPosition();
+    public Vector2 getPosition() {
+        return this.body.getPosition();
     }
 
     /**
@@ -106,5 +106,12 @@ public enum PowerUp {
      */
     public static void setWorld(World world) {
         PowerUp.world = world;
+    }
+
+    /**
+     * Jump the mario in the current state. It gives a default implementation for the jump.
+     */
+    public void jump() {
+        body.applyLinearImpulse(new Vector2(0.0f, Mario.SPEED_UP_Y), body.getWorldCenter(), true);
     }
 }

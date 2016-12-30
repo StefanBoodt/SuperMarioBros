@@ -157,10 +157,10 @@ public class LevelScreen implements Screen, Updateable {
     @Override
     public void dispose() {
         renderer.dispose();
+        map.dispose();
         hud.dispose();
         world.dispose();
         debugRenderer.dispose();
-        map.dispose();
     }
 
     /**
@@ -168,14 +168,15 @@ public class LevelScreen implements Screen, Updateable {
      * @param dt The delta time.
      */
     public void handleInput(float dt) {
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            gamecam.position.x += 100 * dt;
-        } else if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            gamecam.position.x -= 100 * dt;
-        } else if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-            gamecam.position.y += 100 * dt;
+        if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
+            player.jump();
         } else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
             gamecam.position.y -= 100 * dt;
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) && player.canSpeedUpRight()) {
+            player.getBody().applyLinearImpulse(new Vector2(Mario.SPEED_UP_X, 0.0f), player.getBody().getWorldCenter(), true);
+        } else if (Gdx.input.isKeyPressed(Input.Keys.LEFT) && player.canSpeedUpLeft()) {
+            player.getBody().applyLinearImpulse(new Vector2(-Mario.SPEED_UP_X, 0.0f), player.getBody().getWorldCenter(), true);
         }
     }
 
@@ -184,6 +185,7 @@ public class LevelScreen implements Screen, Updateable {
         handleInput(dt);
         hud.update(dt);
         world.step(1 / 60f, 6, 2);
+        gamecam.position.x = player.getBody().getPosition().x;
         gamecam.update();
         renderer.setView(gamecam);
     }
