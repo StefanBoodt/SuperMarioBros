@@ -5,17 +5,19 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mariobros.SuperMarioBros;
 import com.mariobros.interfaces.Updateable;
 import com.mariobros.scenes.HUD;
+import com.mariobros.sprites.hero.Mario;
+import com.mariobros.tools.Box2DWorldCreator;
 
 /**
  * The Screen that paints the level.
@@ -27,6 +29,11 @@ import com.mariobros.scenes.HUD;
  */
 
 public class LevelScreen implements Screen, Updateable {
+
+    /**
+     * General debug boolean.
+     */
+    public static final boolean debug = true;
 
     /**
      * The game that is being played.
@@ -68,6 +75,25 @@ public class LevelScreen implements Screen, Updateable {
      */
     private HUD hud;
 
+    /**
+     * The creator of the box2D debug lines.
+     */
+    private Box2DDebugRenderer debugRenderer;
+
+    /**
+     * Creates the box2D environment.
+     */
+    private Box2DWorldCreator creator;
+
+    /**
+     * The player.
+     */
+    private Mario player;
+
+    /**
+     * Creates a new levelscreen.
+     * @param game The game that is currently being played.
+     */
     public LevelScreen(SuperMarioBros game) {
         this.game = game;
         gamecam = new OrthographicCamera();
@@ -79,6 +105,9 @@ public class LevelScreen implements Screen, Updateable {
         renderer = new OrthogonalTiledMapRenderer(map, 1 / SuperMarioBros.PPM, game.batch);
         gamecam.position.set(gamePort.getWorldWidth() / 2, gamePort.getWorldHeight() / 2, 0);
         world = new World(new Vector2(0, -10), true);
+        debugRenderer = new Box2DDebugRenderer();
+        creator = new Box2DWorldCreator(this);
+        player = new Mario(this, 40.0f / SuperMarioBros.PPM, 40.0f / SuperMarioBros.PPM);
     }
 
     @Override
@@ -96,6 +125,10 @@ public class LevelScreen implements Screen, Updateable {
 
         renderer.render();
         //System.out.println("Rendered: " + renderer.getViewBounds());
+
+        if (debug) {
+            debugRenderer.render(world, gamecam.combined);
+        }
 
         game.batch.setProjectionMatrix(hud.stage.getCamera().combined);
         hud.stage.draw();
@@ -126,6 +159,8 @@ public class LevelScreen implements Screen, Updateable {
         renderer.dispose();
         hud.dispose();
         world.dispose();
+        debugRenderer.dispose();
+        map.dispose();
     }
 
     /**
@@ -151,5 +186,29 @@ public class LevelScreen implements Screen, Updateable {
         world.step(1 / 60f, 6, 2);
         gamecam.update();
         renderer.setView(gamecam);
+    }
+
+    /**
+     * Get the world of this screen (for Box2D).
+     * @return the world.
+     */
+    public World getWorld() {
+        return world;
+    }
+
+    /**
+     * Return the map that is being used.
+     * @return the tilemap in usage for this level.
+     */
+    public TiledMap getMap() {
+        return map;
+    }
+
+    /**
+     * Return the Hud.
+     * @return the hud.
+     */
+    public HUD getHud() {
+        return hud;
     }
 }
