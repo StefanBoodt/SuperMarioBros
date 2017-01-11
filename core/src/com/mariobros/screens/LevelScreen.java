@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
@@ -18,6 +19,7 @@ import com.mariobros.interfaces.Updateable;
 import com.mariobros.scenes.HUD;
 import com.mariobros.sprites.hero.Mario;
 import com.mariobros.tools.Box2DWorldCreator;
+import com.mariobros.tools.WorldCollisionListener;
 
 /**
  * The Screen that paints the level.
@@ -91,11 +93,17 @@ public class LevelScreen implements Screen, Updateable {
     private Mario player;
 
     /**
+     * The texture atlas storing the mario sprites.
+     */
+    private TextureAtlas atlas;
+
+    /**
      * Creates a new levelscreen.
      * @param game The game that is currently being played.
      */
     public LevelScreen(SuperMarioBros game) {
         this.game = game;
+        atlas = new TextureAtlas("mario-sheet.txt");
         gamecam = new OrthographicCamera();
         gamePort = new FitViewport(SuperMarioBros.V_WIDTH / SuperMarioBros.PPM, SuperMarioBros.V_HEIGHT / SuperMarioBros.PPM, gamecam);
         hud = new HUD(game.batch, "1-1", 300);
@@ -108,6 +116,7 @@ public class LevelScreen implements Screen, Updateable {
         debugRenderer = new Box2DDebugRenderer();
         creator = new Box2DWorldCreator(this);
         player = new Mario(this, 40.0f / SuperMarioBros.PPM, 40.0f / SuperMarioBros.PPM);
+        world.setContactListener(new WorldCollisionListener());
     }
 
     @Override
@@ -118,20 +127,25 @@ public class LevelScreen implements Screen, Updateable {
     @Override
     public void render(float delta) {
         update(delta);
-
-        //Clear the game screen with Black
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
         renderer.render();
-        //System.out.println("Rendered: " + renderer.getViewBounds());
-
         if (debug) {
             debugRenderer.render(world, gamecam.combined);
         }
-
+        drawMario();
         game.batch.setProjectionMatrix(hud.stage.getCamera().combined);
         hud.stage.draw();
+    }
+
+    /**
+     * Draws Mario to the screen.
+     */
+    private void drawMario() {
+        game.batch.setProjectionMatrix(gamecam.combined);
+        game.batch.begin();
+        player.draw(game.batch);
+        game.batch.end();
     }
 
     @Override
@@ -185,6 +199,7 @@ public class LevelScreen implements Screen, Updateable {
         handleInput(dt);
         hud.update(dt);
         world.step(1 / 60f, 6, 2);
+        player.update(dt);
         gamecam.position.x = player.getBody().getPosition().x;
         gamecam.update();
         renderer.setView(gamecam);
@@ -212,5 +227,13 @@ public class LevelScreen implements Screen, Updateable {
      */
     public HUD getHud() {
         return hud;
+    }
+
+    /**
+     * Returns the atlas.
+     * @return The atlas for the mario sprites.
+     */
+    public TextureAtlas getAtlas() {
+        return atlas;
     }
 }

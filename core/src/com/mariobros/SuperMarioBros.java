@@ -70,6 +70,16 @@ public class SuperMarioBros extends Game {
 	 * The bit that identifies enemies.
 	 */
 	public static final short ENEMY_BIT = 16;
+
+	/**
+	 * The bit that identifies items.
+	 */
+	public static final short ITEM_BIT = 32;
+
+	/**
+	 * The bit that defines blocks.
+	 */
+	public static final short BLOCK_BIT = 64;
 	
 	@Override
 	public void create () {

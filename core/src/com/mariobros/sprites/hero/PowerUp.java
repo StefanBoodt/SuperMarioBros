@@ -1,12 +1,17 @@
 package com.mariobros.sprites.hero;
 
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.CircleShape;
+import com.badlogic.gdx.physics.box2d.EdgeShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.World;
 import com.mariobros.SuperMarioBros;
+import com.mariobros.interfaces.Updateable;
+import com.mariobros.screens.LevelScreen;
 import com.mariobros.sprites.enemies.Enemy;
 
 /**
@@ -17,7 +22,7 @@ import com.mariobros.sprites.enemies.Enemy;
  *
  * @author stefan boodt
  */
-public enum PowerUp {
+public enum PowerUp implements Updateable {
 
     NORMAL() {
         @Override
@@ -36,19 +41,53 @@ public enum PowerUp {
             BodyDef bdef = new BodyDef();
             bdef.position.set(position);
             bdef.type = BodyDef.BodyType.DynamicBody;
-            this.body = PowerUp.world.createBody(bdef);
+            this.body = screen.getWorld().createBody(bdef);
             FixtureDef fdef = new FixtureDef();
             CircleShape shape = new CircleShape();
-            shape.setRadius(6 / SuperMarioBros.PPM);
+            shape.setRadius(7 / SuperMarioBros.PPM);
+            setFilters(fdef);
             fdef.shape = shape;
             this.body.createFixture(fdef);
+
+            EdgeShape head = new EdgeShape();
+            head.set(new Vector2(-2 / SuperMarioBros.PPM, 7 / SuperMarioBros.PPM),
+                    new Vector2(2 / SuperMarioBros.PPM, 7 / SuperMarioBros.PPM));
+            fdef.isSensor = true;
+            fdef.shape = head;
+            body.createFixture(fdef).setUserData(this);
         }
 
         @Override
         public void redefine() {
             Vector2 position = getPosition();
-            world.destroyBody(body);
+            screen.getWorld().destroyBody(body);
             define(position);
+        }
+
+        @Override
+        public TextureRegion getRegion() {
+            return screen.getAtlas().findRegion("little_mario");
+        }
+
+        @Override
+        public TextureRegion getStanding() {
+            System.out.println("(" + getRegion().getRegionX() + ", " + getRegion().getRegionY() + ")");
+            return new TextureRegion(getRegion().getTexture(), 0, 0, 16, 16);
+        }
+
+        @Override
+        public TextureRegion getWalking(){
+            return null;
+        }
+
+        @Override
+        public TextureRegion getJumping() {
+            return null;
+        }
+
+        @Override
+        public void update(float dt) {
+
         }
     };//,
 
@@ -62,9 +101,9 @@ public enum PowerUp {
     protected Body body;
 
     /**
-     * The world to live in.
+     * The Screen used.
      */
-    protected static World world;
+    protected static LevelScreen screen;
 
     private PowerUp() {
 
@@ -101,11 +140,11 @@ public enum PowerUp {
     public abstract void redefine();
 
     /**
-     * Sets the world to be affected by.
-     * @param world The world to live in.
+     * Sets the screen to be affected by.
+     * @param screen The screen to live in.
      */
-    public static void setWorld(World world) {
-        PowerUp.world = world;
+    public static void setScreen(LevelScreen screen) {
+        PowerUp.screen = screen;
     }
 
     /**
@@ -114,4 +153,37 @@ public enum PowerUp {
     public void jump() {
         body.applyLinearImpulse(new Vector2(0.0f, Mario.SPEED_UP_Y), body.getWorldCenter(), true);
     }
+
+    protected void setFilters(FixtureDef fdef) {
+        fdef.filter.categoryBits = SuperMarioBros.MARIO_BIT;
+        fdef.filter.maskBits = SuperMarioBros.GROUND_BIT | SuperMarioBros.OBJECT_BIT | SuperMarioBros.ENEMY_BIT
+                | SuperMarioBros.BLOCK_BIT;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public abstract TextureRegion getStanding();
+
+    /**
+     *
+     * @return
+     */
+    public abstract TextureRegion getWalking();
+
+    /**
+     *
+     * @return
+     */
+    public abstract TextureRegion getJumping();
+
+    /**
+     * Return the entire region
+     * @return
+     */
+    protected abstract TextureRegion getRegion();
+
+    @Override
+    public abstract void update(float dt);
 }

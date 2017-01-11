@@ -1,6 +1,7 @@
 package com.mariobros.sprites.tileobjects;
 
 import com.badlogic.gdx.maps.MapObject;
+import com.mariobros.SuperMarioBros;
 import com.mariobros.screens.LevelScreen;
 import com.mariobros.sprites.hero.Mario;
 
@@ -20,7 +21,8 @@ public class Brick extends InteractiveTileObject {
 
     @Override
     public void onHeadHit(Mario mario) {
-
+        setCategoryFilter(SuperMarioBros.NOTHING_BIT);
+        getCell().setTile(null);
     }
 
 }

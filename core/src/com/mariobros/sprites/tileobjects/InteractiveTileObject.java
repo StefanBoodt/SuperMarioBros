@@ -94,22 +94,35 @@ public abstract class InteractiveTileObject {
 
         shape.setAsBox(bounds.getWidth() / 2 / SuperMarioBros.PPM, bounds.getHeight() / 2 / SuperMarioBros.PPM);
         fdef.shape = shape;
+        fdef.filter.categoryBits = SuperMarioBros.BLOCK_BIT;
         fixture = body.createFixture(fdef);
+        fixture.setUserData(this);
     }
 
     /**
      * Code that specifies what should to the block happen if marios head collides with the object.
      * @param mario The mario that collides with this block.
      */
-    public abstract void onHeadHit(Mario mario);
+    public abstract void onHeadHit(final Mario mario);
 
     /**
      * Sets the catagory to the specified bit.
      * @param filterBit The catagory to classify this object as.
      */
-    public void setCategoryFilter(short filterBit) {
+    public void setCategoryFilter(final short filterBit) {
         Filter filter = new Filter();
         filter.categoryBits = filterBit;
         fixture.setFilterData(filter);
+    }
+
+    /**
+     * Returns the Cell this object is in inside the map object.
+     * @return The Cell in the map this object is in.
+     */
+    public TiledMapTileLayer.Cell getCell() {
+        final TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get("Blocks");
+        final int x = (int) (body.getPosition().x * SuperMarioBros.PPM / layer.getTileWidth());
+        final int y = (int) (body.getPosition().y * SuperMarioBros.PPM / layer.getHeight());
+        return layer.getCell(x, y);
     }
 }

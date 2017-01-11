@@ -1,0 +1,33 @@
+mario-sheet-32x32.png
+size: 754, 112
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+big_mario
+  rotate: false
+  xy: 1, 32
+  size: 723, 29
+  orig: 960, 32
+  offset: 7, 0
+  index: -1
+fire_mario
+  rotate: false
+  xy: 1, 1
+  size: 752, 29
+  orig: 800, 32
+  offset: 9, 0
+  index: -1
+little_mario
+  rotate: false
+  xy: 1, 63
+  size: 636, 30
+  orig: 640, 32
+  offset: 4, 0
+  index: -1
+little_mario_16x16
+  rotate: false
+  xy: 1, 95
+  size: 319, 16
+  orig: 320, 16
+  offset: 0, 0
+  index: -1
