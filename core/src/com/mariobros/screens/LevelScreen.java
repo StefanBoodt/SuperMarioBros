@@ -103,7 +103,7 @@ public class LevelScreen implements Screen, Updateable {
      */
     public LevelScreen(SuperMarioBros game) {
         this.game = game;
-        atlas = new TextureAtlas("mario-sheet.txt");
+        atlas = new TextureAtlas("mario-sheet-32x32.txt");
         gamecam = new OrthographicCamera();
         gamePort = new FitViewport(SuperMarioBros.V_WIDTH / SuperMarioBros.PPM, SuperMarioBros.V_HEIGHT / SuperMarioBros.PPM, gamecam);
         hud = new HUD(game.batch, "1-1", 300);
