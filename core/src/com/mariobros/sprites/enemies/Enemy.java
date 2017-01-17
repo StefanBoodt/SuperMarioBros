@@ -1,5 +1,8 @@
 package com.mariobros.sprites.enemies;
 
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.mariobros.interfaces.Updateable;
+import com.mariobros.screens.LevelScreen;
 import com.mariobros.sprites.hero.Mario;
 
 /**
@@ -12,11 +15,16 @@ import com.mariobros.sprites.hero.Mario;
  * @author stefan boodt
  */
 
-public abstract class Enemy {
+public abstract class Enemy extends Sprite implements Updateable {
+	
+	/**
+	 * Screen to use.
+	 */
+	protected LevelScreen screen;
 
-
-    public Enemy() {
-
+    public Enemy(LevelScreen screen, float x, float y) {
+    	this.screen = screen;
+    	setPosition(x,y);
     }
 
     /**

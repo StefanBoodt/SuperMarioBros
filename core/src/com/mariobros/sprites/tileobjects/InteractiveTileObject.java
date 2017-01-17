@@ -122,7 +122,7 @@ public abstract class InteractiveTileObject {
     public TiledMapTileLayer.Cell getCell() {
         final TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get("Blocks");
         final int x = (int) (body.getPosition().x * SuperMarioBros.PPM / layer.getTileWidth());
-        final int y = (int) (body.getPosition().y * SuperMarioBros.PPM / layer.getHeight());
+        final int y = (int) (body.getPosition().y * SuperMarioBros.PPM / layer.getTileHeight());
         return layer.getCell(x, y);
     }
 }

@@ -103,12 +103,12 @@ public class LevelScreen implements Screen, Updateable {
      */
     public LevelScreen(SuperMarioBros game) {
         this.game = game;
-        atlas = new TextureAtlas("mario-sheet-32x32.txt");
+        atlas = game.manager.get("mario-sheet-32x32.txt");
         gamecam = new OrthographicCamera();
         gamePort = new FitViewport(SuperMarioBros.V_WIDTH / SuperMarioBros.PPM, SuperMarioBros.V_HEIGHT / SuperMarioBros.PPM, gamecam);
         hud = new HUD(game.batch, "1-1", 300);
         maploader = new TmxMapLoader();
-        map = maploader.load("testworld.tmx");
+        map = maploader.load("worlds/world1-1.tmx");
         //map = maploader.load("Graphics-tests.tmx");
         renderer = new OrthogonalTiledMapRenderer(map, 1 / SuperMarioBros.PPM, game.batch);
         gamecam.position.set(gamePort.getWorldWidth() / 2, gamePort.getWorldHeight() / 2, 0);
@@ -236,4 +236,10 @@ public class LevelScreen implements Screen, Updateable {
     public TextureAtlas getAtlas() {
         return atlas;
     }
+
+    /**
+     * Return the game that is being played.
+     * @return The current game.
+     */
+    public SuperMarioBros getGame() { return game; }
 }

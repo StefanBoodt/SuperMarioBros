@@ -21,8 +21,10 @@ public class Brick extends InteractiveTileObject {
 
     @Override
     public void onHeadHit(Mario mario) {
-        setCategoryFilter(SuperMarioBros.NOTHING_BIT);
-        getCell().setTile(null);
+        if (mario.getPowerUp() != Mario.PowerUp.NORMAL) {
+            setCategoryFilter(SuperMarioBros.NOTHING_BIT);
+            getCell().setTile(null);
+        }
     }
 
 }

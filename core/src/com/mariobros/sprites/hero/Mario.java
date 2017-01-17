@@ -38,12 +38,12 @@ public class Mario extends Sprite implements Updateable {
     /**
      * Enum for different states.
      */
-    public enum State { RUNNING, JUMPING, STANDING, DEAD, FALLING};
+    public enum State {RUNNING, JUMPING, STANDING, DEAD};
 
     /**
      * Enum for powerups.
      */
-    public enum PowerUp { NORMAL, SUPER};
+    public enum PowerUp {NORMAL, SUPER};
 
     /**
      * The current state.
@@ -217,7 +217,6 @@ public class Mario extends Sprite implements Updateable {
 
     @Override
     public void update(float dt) {
-        //powerup.update(dt);
         setPosition(getPosition().x - getWidth() / 2, getPosition().y - getHeight() / 2);
         setRegion(getFrame(dt));
     }
@@ -243,7 +242,7 @@ public class Mario extends Sprite implements Updateable {
     /**
      * Define marios figure in the boxworld.
      */
-    public void define() {
+    protected void define() {
         Vector2 position = new Vector2(40.0f / SuperMarioBros.PPM, 60.0f / SuperMarioBros.PPM);
         define(position);
     }
@@ -252,7 +251,7 @@ public class Mario extends Sprite implements Updateable {
      * Define marios figure in the boxworld.
      * @param position The starting position.
      */
-    public void define(Vector2 position) {
+    protected void define(Vector2 position) {
         switch (powerup) {
             case NORMAL:
                 BodyDef bdef = new BodyDef();
@@ -264,13 +263,14 @@ public class Mario extends Sprite implements Updateable {
                 shape.setRadius(7 / SuperMarioBros.PPM);
                 setFilters(fdef);
                 fdef.shape = shape;
-                this.body.createFixture(fdef);
+                this.body.createFixture(fdef).setUserData(this);
 
                 EdgeShape head = new EdgeShape();
                 head.set(new Vector2(-2 / SuperMarioBros.PPM, 7 / SuperMarioBros.PPM),
                         new Vector2(2 / SuperMarioBros.PPM, 7 / SuperMarioBros.PPM));
                 fdef.isSensor = true;
                 fdef.shape = head;
+                fdef.filter.categoryBits = SuperMarioBros.MARIO_HEAD_BIT;
                 body.createFixture(fdef).setUserData(this);
                 break;
         }
@@ -279,7 +279,7 @@ public class Mario extends Sprite implements Updateable {
     /**
      * Redefines marios figure in the boxworld.
      */
-    public void redefine() {
+    protected void redefine() {
         Vector2 position = getPosition();
         screen.getWorld().destroyBody(body);
         define(position);
@@ -289,8 +289,23 @@ public class Mario extends Sprite implements Updateable {
      * Makes mario jump.
      */
     public void jump() {
-        setState(State.JUMPING);
         body.applyLinearImpulse(new Vector2(0.0f, Mario.SPEED_UP_Y), body.getWorldCenter(), true);
+    }
+
+    /**
+     * Gets the state the player should be in.
+     * @return The correct state.
+     */
+    protected State getState() {
+        if (currentState == State.DEAD) {
+            return State.DEAD;
+        } else if (body.getLinearVelocity().y > Mario.SPEED_UP_Y / 10 || (previousState  == State.JUMPING && body.getLinearVelocity().y < 0)) {
+            return State.JUMPING;
+        } else if (body.getLinearVelocity().x != 0) {
+            return State.RUNNING;
+        } else {
+            return State.STANDING;
+        }
     }
 
     /**
@@ -308,11 +323,16 @@ public class Mario extends Sprite implements Updateable {
         }
     }
 
+    /**
+     * Gets the frame to draw.
+     * @param dt The delta time.
+     * @return The frame of mario right now.
+     */
     public TextureRegion getFrame(float dt) {
+        setState(getState());
         TextureRegion frame = null;
         switch (currentState) {
             case STANDING:
-            case FALLING:
                 frame = getStanding();
                 break;
             case JUMPING:
@@ -330,11 +350,12 @@ public class Mario extends Sprite implements Updateable {
             frame.flip(true, false);
             facingRight = false;
         }
-        //if mario is running right and the texture isnt facing right... flip it.
         else if((body.getLinearVelocity().x > 0 || facingRight) && frame.isFlipX()){
             frame.flip(true, false);
             facingRight = true;
         }
+        stateTimer += dt;
+        previousState = currentState;
         return frame;
     }
 
@@ -370,7 +391,7 @@ public class Mario extends Sprite implements Updateable {
      * @return The walking animation.
      */
     public Animation<TextureRegion> getWalking() {
-        Animation walking = null;
+        Animation<TextureRegion> walking = null;
         switch (powerup) {
             case NORMAL:
                 walking = marioRun.get(0);
@@ -419,7 +440,7 @@ public class Mario extends Sprite implements Updateable {
     protected void setFilters(FixtureDef fdef) {
         fdef.filter.categoryBits = SuperMarioBros.MARIO_BIT;
         fdef.filter.maskBits = SuperMarioBros.GROUND_BIT | SuperMarioBros.OBJECT_BIT | SuperMarioBros.ENEMY_BIT
-                | SuperMarioBros.BLOCK_BIT;
+                | SuperMarioBros.BLOCK_BIT | SuperMarioBros.ENEMY_WEAKNESS_BIT;
     }
 
     /**
@@ -437,5 +458,12 @@ public class Mario extends Sprite implements Updateable {
                 break;
         }
         return screen.getAtlas().findRegion(regionname);
+    }
+
+    /**
+     * Returns the powerup mario currently has.
+     */
+    public PowerUp getPowerUp() {
+        return powerup;
     }
 }

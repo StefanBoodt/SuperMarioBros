@@ -7,6 +7,8 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.mariobros.interfaces.Updateable;
 import com.mariobros.screens.LevelScreen;
 
@@ -80,11 +82,25 @@ public class SuperMarioBros extends Game {
 	 * The bit that defines blocks.
 	 */
 	public static final short BLOCK_BIT = 64;
+
+	/**
+	 * The bit that identifies marios head.
+	 */
+	public static final short MARIO_HEAD_BIT = 128;
+
+	/**
+	 * The bit identifying the enemies weakness.
+	 */
+	public static final short ENEMY_WEAKNESS_BIT = 256;
 	
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
 		manager = new AssetManager();
+		manager.load("mario-sheet-32x32.txt", TextureAtlas.class);
+		manager.load("items.txt", TextureAtlas.class);
+		manager.load("tileset.txt", TextureAtlas.class);
+		manager.load("used_block_16x16.png", Texture.class);
 		manager.finishLoading();
 		setScreen(new LevelScreen(this));
 	}

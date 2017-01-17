@@ -12,7 +12,9 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.mariobros.SuperMarioBros;
 import com.mariobros.screens.LevelScreen;
+import com.mariobros.sprites.enemies.Goomba;
 import com.mariobros.sprites.tileobjects.Brick;
+import com.mariobros.sprites.tileobjects.ItemBlock;
 
 /**
  * Renders the Box2D world and renders debug lines.
@@ -32,9 +34,18 @@ public class Box2DWorldCreator {
         Map map = screen.getMap();
 
         immobileBodyDefs(world, map, "Ground", SuperMarioBros.GROUND_BIT);
-        immobileBodyDefs(world, map, "Objects", SuperMarioBros.OBJECT_BIT);
+        immobileBodyDefs(world, map, "Coins", SuperMarioBros.ITEM_BIT);
+        immobileBodyDefs(world, map, "Pipes", SuperMarioBros.OBJECT_BIT);
+        immobileBodyDefs(world, map, "Checkpoints", SuperMarioBros.OBJECT_BIT);
         for(MapObject object : map.getLayers().get("Blocks").getObjects().getByType(RectangleMapObject.class)){
             new Brick(screen, object);
+        }
+        for(MapObject object : map.getLayers().get("ItemBlocks").getObjects().getByType(RectangleMapObject.class)){
+            new ItemBlock(screen, object);
+        }
+        for(MapObject object : map.getLayers().get("Goombas").getObjects().getByType(RectangleMapObject.class)){
+            Rectangle rect = ((RectangleMapObject) object).getRectangle();
+            new Goomba(screen, rect.getX(), rect.getY());
         }
     }
 
